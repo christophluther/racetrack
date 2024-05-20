@@ -370,6 +370,7 @@ class AbstractEnv(gym.Env):
                 vehicles[i] = vehicle_class.create_from(v)
         return env_copy
 
+    # CL: set preferred lane, THIS IS ONLY FOR NON EGO VEHICLES
     def set_preferred_lane(self, preferred_lane: int = None) -> "AbstractEnv":
         env_copy = copy.deepcopy(self)
         if preferred_lane:

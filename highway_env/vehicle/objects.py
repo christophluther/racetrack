@@ -215,6 +215,10 @@ class Obstacle(RoadObject):
 
     """Obstacles on the road."""
 
+    # CL: alter length and width
+    LENGTH: float = 4  # Object length [m]
+    WIDTH: float = 4  # Object width [m]
+
     def __init__(
         self, road, position: Sequence[float], heading: float = 0, speed: float = 0
     ):
