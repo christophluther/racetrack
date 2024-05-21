@@ -91,7 +91,8 @@ class RacetrackEnv(AbstractEnv):
         # CL: Above: Original reward, below alternative
         if self.config["new_reward"]:
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
-            reward = (1-self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"]
+            reward = ((1-self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
+                     - self._is_terminated())
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
