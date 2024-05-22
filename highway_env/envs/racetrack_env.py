@@ -65,7 +65,7 @@ class RacetrackEnv(AbstractEnv):
                 "hit": False,                       # CL: Allows 'hits' but continuing, i.e., 'ghost car'
                 "terminate_off_road": False,        # CL: terminate if car goes off road
                 "speed_limits": [None, 25, 15, 25, 15, 25, 15, 25, 15],     # CL: Speed limits for road segments
-                "extra_speed": [None, 10, 5, 2],    # CL: More speed on inner most lanes
+                "extra_speed": [10, 5, 2],    # CL: More speed on inner most lanes
                 "no_lanes": 6,                                              # CL: Integer number of lanes
                 "rand_object": 0,                   # No. of random object on road
                 "scenario_1": False,                # Custom scenario 1
@@ -638,8 +638,8 @@ class RacetrackEnvV1(RacetrackEnv):
         # CL: This for loop must be separate for every segment bcs segment names have to be introduced
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             # successively add lanes
@@ -690,8 +690,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -740,8 +740,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -789,8 +789,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -839,8 +839,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -888,8 +888,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -938,8 +938,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
@@ -987,8 +987,8 @@ class RacetrackEnvV1(RacetrackEnv):
 
         for i in range(2,self.config["no_lanes"]):
             """Add additional lanes between """
-            if i < 4:
-                extra = + extra_speed[i]
+            if i < len(extra_speed):
+                extra = extra_speed[i]
             else:
                 extra = 0
             net.add_lane(
