@@ -621,10 +621,18 @@ class RacetrackEnvV1(RacetrackEnv):
     def _make_road(self) -> None:
         net = RoadNetwork()
 
+        # define rng
+        rng = self.np_random
+        rng_int = np.random.default_rng()
+
         # Set Speed Limits for Road Sections - Straight, Turn20, Straight, Turn 15, Turn15, Straight, Turn25x2, Turn18
         speedlimits = self.config["speed_limits"]
         extra_speed = self.config["extra_speed"]
         length_v1 = self.config["length_v1"]
+        if self.config["no_lanes"] == 0:
+            no_lanes = rng_int.integers(2, high=7)
+        else:
+            no_lanes = self.config["no_lanes"]
 
         # Lane 1: Initialise First Inner Lane
         lane = StraightLane(
@@ -637,7 +645,7 @@ class RacetrackEnvV1(RacetrackEnv):
         self.lane = lane
 
         # CL: This for loop must be separate for every segment bcs segment names have to be introduced
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -663,8 +671,8 @@ class RacetrackEnvV1(RacetrackEnv):
             "a",
             "b",
             StraightLane(
-                [0, (self.config["no_lanes"]-1) * 5],
-                [length_v1 + 1, (self.config["no_lanes"]-1) * 5],
+                [0, (no_lanes-1) * 5],
+                [length_v1 + 1, (no_lanes-1) * 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
                 speed_limit=speedlimits[1],
@@ -689,7 +697,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -716,7 +724,7 @@ class RacetrackEnvV1(RacetrackEnv):
             "c",
             CircularLane(
                 center1,
-                radii1 + (self.config["no_lanes"]-1) * 5,
+                radii1 + (no_lanes-1) * 5,
                 np.deg2rad(90),
                 np.deg2rad(0),
                 width=5,
@@ -739,7 +747,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -762,8 +770,8 @@ class RacetrackEnvV1(RacetrackEnv):
             "c",
             "d",
             StraightLane(
-                [length_v1 + 20 + (self.config["no_lanes"]-1) * 5, -20],
-                [length_v1 + 20 + (self.config["no_lanes"]-1) * 5, -50],
+                [length_v1 + 20 + (no_lanes-1) * 5, -20],
+                [length_v1 + 20 + (no_lanes-1) * 5, -50],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
                 speed_limit=speedlimits[3],
@@ -788,7 +796,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -815,7 +823,7 @@ class RacetrackEnvV1(RacetrackEnv):
             "e",
             CircularLane(
                 center2,
-                radii2 + (self.config["no_lanes"]-1) * 5,
+                radii2 + (no_lanes-1) * 5,
                 np.deg2rad(0),
                 np.deg2rad(-90),
                 width=5,
@@ -838,7 +846,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -861,8 +869,8 @@ class RacetrackEnvV1(RacetrackEnv):
             "e",
             "f",
             StraightLane(
-                [length_v1 + 5, -(65+(self.config["no_lanes"]-1) * 5)],
-                [-5, -(65+(self.config["no_lanes"]-1) * 5)],
+                [length_v1 + 5, -(65+(no_lanes-1) * 5)],
+                [-5, -(65+(no_lanes-1) * 5)],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
                 speed_limit=speedlimits[5],
@@ -887,7 +895,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -914,7 +922,7 @@ class RacetrackEnvV1(RacetrackEnv):
             "g",
             CircularLane(
                 center4,
-                radii4 + (self.config["no_lanes"]-1) * 5,
+                radii4 + (no_lanes-1) * 5,
                 np.deg2rad(-90),
                 np.deg2rad(-180),
                 width=5,
@@ -937,7 +945,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -960,8 +968,8 @@ class RacetrackEnvV1(RacetrackEnv):
             "g",
             "h",
             StraightLane(
-                [-20 - (self.config["no_lanes"]-1) * 5, -50],
-                [-20 - (self.config["no_lanes"]-1) * 5, -20],
+                [-20 - (no_lanes-1) * 5, -50],
+                [-20 - (no_lanes-1) * 5, -20],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
                 speed_limit=speedlimits[7],
@@ -986,7 +994,7 @@ class RacetrackEnvV1(RacetrackEnv):
             ),
         )
 
-        for i in range(2,self.config["no_lanes"]):
+        for i in range(2,no_lanes):
             """Add additional lanes between """
             if i < int(len(extra_speed)):
                 extra = extra_speed[i-1]
@@ -1013,7 +1021,7 @@ class RacetrackEnvV1(RacetrackEnv):
             "a",
             CircularLane(
                 center6,
-                radii6 + (self.config["no_lanes"] - 1) * 5,
+                radii6 + (no_lanes - 1) * 5,
                 np.deg2rad(180),
                 np.deg2rad(90),
                 width=5,
@@ -1055,15 +1063,13 @@ class RacetrackEnvV1(RacetrackEnv):
             obstacle_5 = Obstacle(self.road, [length_v1-80, 20])
             self.road.objects.append(obstacle_5)
 
-        rng = self.np_random
-
         if self.config["rand_object"] is not None:
             # How many lanes?
-            no_lanes = self.config["no_lanes"]
+            no_lanes_obj = no_lanes
             j = 0
             while j < self.config["rand_object"]:
                 # choose lane
-                lane = rng.choice(range(0, no_lanes, 1))
+                lane = rng.choice(range(0, no_lanes_obj, 1))
                 # chose segment (one of the four straights)
                 segment = rng.choice(range(0, 4, 1))
                 if segment == 0:
@@ -1085,3 +1091,104 @@ class RacetrackEnvV1(RacetrackEnv):
                 else:
                     pass
                 j+=1
+
+
+class RacetrackEnvV2(RacetrackEnv):
+    """
+    A variant of racetrack-v0 with more lanes:
+    """
+    def _make_road(self) -> None:
+        net = RoadNetwork()
+
+        # Lane 1: Initialise First Inner Lane
+        lane = StraightLane(
+            [0, 0],
+            [100 + 1, 0],
+            line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+            width=5,
+            speed_limit=speedlimits[1] + extra_speed[0],
+        )
+        self.lane = lane
+
+        # Lane 1: Outter Lane
+        net.add_lane("a", "b", lane)
+        net.add_lane(
+            "a",
+            "b",
+            StraightLane(
+                [0, 5],
+                [100 + 1, * 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[1],
+            ),
+        )
+
+        # Turn 1: Inner Lane
+        center1 = [100, -20]
+        radii1 = 20
+        net.add_lane(
+            "b",
+            "c",
+            CircularLane(
+                center1,
+                radii1,
+                np.deg2rad(90),
+                np.deg2rad(0),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[2] + extra_speed[0],
+            ),
+        )
+
+        # Turn 1: Outter Lane
+        net.add_lane(
+            "b",
+            "c",
+            CircularLane(
+                center1,
+                radii1 + 5,
+                np.deg2rad(90),
+                np.deg2rad(0),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[2],
+            ),
+        )
+
+        # Vertical Straight 1: Inner Lane
+        net.add_lane(
+            "c",
+            "d",
+            StraightLane(
+                [100 + 20, -20],
+                [100 + 20, -30],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[3] + extra_speed[0],
+            ),
+        )
+
+        # Vertical Straight 1: Outter Lane
+        net.add_lane("c", "d", lane)
+        net.add_lane(
+            "c",
+            "d",
+            StraightLane(
+                [100 + 20 + 5, -20],
+                [100 + 20 + 5, -30],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[1],
+            ),
+        )
+
+
+        road = Road(
+            network=net,
+            np_random=self.np_random,
+            record_history=self.config["show_trajectories"],
+        )
+        self.road = road
