@@ -63,13 +63,14 @@ class RacetrackEnv(AbstractEnv):
                 "new_reward": True,                 # CL: Created new reward function; used if int
                 "restrict_init_collision": 20,      # CL: Change the distance to prevent init collision
                 "hit": False,                       # CL: Allows 'hits' but continuing, i.e., 'ghost car'
-                "terminate_off_road": False,        # CL: terminate if car goes off road
+                "terminate_off_road": False,        # CL: terminate if car goes off-road
                 "speed_limits": [None, 25, 15, 25, 15, 25, 15, 25, 15],     # CL: Speed limits for road segments
-                "extra_speed": [10, 5, 2],    # CL: More speed on inner most lanes
-                "no_lanes": 6,                                              # CL: Integer number of lanes
-                "rand_object": 0,                   # No. of random object on road
-                "scenario_1": False,                # Custom scenario 1
-                "length_v1": 200,                   # length of track for v1
+                "extra_speed": [10, 5, 2],          # CL: More speed on innermost lanes
+                "no_lanes": 6,                      # CL: Integer number of lanes
+                "rand_object": 0,                   # CL: No. of random object on road
+                "scenario_1": False,                # CL: Custom scenario 1
+                "length_v1": 200,                   # CL: length of track for v1
+                "max_objects": 4,                   # CL: maximum number of objects per lane
             }
         )
         return config
@@ -628,7 +629,12 @@ class RacetrackEnvV1(RacetrackEnv):
         # Set Speed Limits for Road Sections - Straight, Turn20, Straight, Turn 15, Turn15, Straight, Turn25x2, Turn18
         speedlimits = self.config["speed_limits"]
         extra_speed = self.config["extra_speed"]
-        length_v1 = self.config["length_v1"]
+
+        if self.config["length_v1"] == 0:
+            length_v1 = rng_int.integers(150, high=250)
+        else:
+            length_v1 = self.config["length_v1"]
+
         if self.config["no_lanes"] == 0:
             no_lanes = rng_int.integers(2, high=7)
         else:
@@ -1064,12 +1070,16 @@ class RacetrackEnvV1(RacetrackEnv):
             self.road.objects.append(obstacle_5)
 
         if self.config["rand_object"] is not None:
-            # How many lanes?
-            no_lanes_obj = no_lanes
+
+            if self.config["rand_object"] == 0:
+                no_obj = rng_int.integers(1, high=no_lanes * self.config["max_objects"])
+            else:
+                no_obj = np.min([self.config["rand_object"], no_lanes*self.config["max_objects"]])
+
             j = 0
-            while j < self.config["rand_object"]:
+            while j < no_obj:
                 # choose lane
-                lane = rng.choice(range(0, no_lanes_obj, 1))
+                lane = rng.choice(range(0, no_lanes, 1))
                 # chose segment (one of the four straights)
                 segment = rng.choice(range(0, 4, 1))
                 if segment == 0:
