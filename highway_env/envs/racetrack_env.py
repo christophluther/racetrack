@@ -631,7 +631,7 @@ class RacetrackEnvV1(RacetrackEnv):
         extra_speed = self.config["extra_speed"]
 
         if self.config["length_v1"] == 0:
-            length_v1 = rng_int.integers(150, high=250)
+            length_v1 = rng_int.integers(100, high=200)
         else:
             length_v1 = self.config["length_v1"]
 
