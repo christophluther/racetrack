@@ -430,6 +430,7 @@ class RacetrackEnv(AbstractEnv):
         self.road.vehicles.append(vehicle)
 
         # Other vehicles
+        # CL no of other vehicles chosen randomly anyway lol
         for i in range(rng.integers(self.config["other_vehicles"])):
             random_lane_index = self.road.network.random_lane_index(rng)
             vehicle = IDMVehicle.make_on_lane(self.road, random_lane_index,
@@ -671,7 +672,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Lane 1: Outter Lane
+        # Lane 1: Outer Lane
         net.add_lane("a", "b", lane)
         net.add_lane(
             "a",
@@ -724,7 +725,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Turn 1: Outter Lane
+        # Turn 1: Outer Lane
         net.add_lane(
             "b",
             "c",
@@ -771,7 +772,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Vertical Straight 1: Outter Lane
+        # Vertical Straight 1: Outer Lane
         net.add_lane(
             "c",
             "d",
@@ -823,7 +824,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Turn 2: Outter Lane
+        # Turn 2: Outer Lane
         net.add_lane(
             "d",
             "e",
@@ -870,7 +871,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Horizontal Straight 2: Outter Lane
+        # Horizontal Straight 2: Outer Lane
         net.add_lane(
             "e",
             "f",
@@ -922,7 +923,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Turn 3: Outter Lane
+        # Turn 3: Outer Lane
         net.add_lane(
             "f",
             "g",
@@ -969,7 +970,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Straight 4: Outter Lane
+        # Straight 4: Outer Lane
         net.add_lane(
             "g",
             "h",
@@ -1021,7 +1022,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 ),
             )
 
-        # Turn 4: Outter Lane
+        # Turn 4: Outer Lane
         net.add_lane(
             "h",
             "a",
@@ -1105,96 +1106,605 @@ class RacetrackEnvV1(RacetrackEnv):
 
 class RacetrackEnvV2(RacetrackEnv):
     """
-    A variant of racetrack-v0 with more lanes:
+    A variant of racetrack-v0 with more loops:
     """
     def _make_road(self) -> None:
         net = RoadNetwork()
 
-        # Lane 1: Initialise First Inner Lane
+        # define rng
+        rng = self.np_random
+        rng_int = np.random.default_rng()
+
+        # Set Speed Limits for Road Sections - Straight, Turn20, Straight, Turn 15, Turn15, Straight, Turn25x2, Turn18
+        speedlimits = self.config["speed_limits"]
+        extra_speed = self.config["extra_speed"]
+
+        ########### pt. a ############
+
+        # Lane A: Initialise First Inner Lane
         lane = StraightLane(
-            [0, 0],
-            [100 + 1, 0],
+            [-0.2, 0],
+            [14.6, 0],
             line_types=(LineType.CONTINUOUS, LineType.STRIPED),
             width=5,
             speed_limit=speedlimits[1] + extra_speed[0],
         )
         self.lane = lane
 
-        # Lane 1: Outter Lane
+        # Lane A: Outer Lane
         net.add_lane("a", "b", lane)
         net.add_lane(
             "a",
             "b",
             StraightLane(
-                [0, 5],
-                [100 + 1, * 5],
+                [-0.2, 5],
+                [14.6, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
                 speed_limit=speedlimits[1],
             ),
         )
 
-        # Turn 1: Inner Lane
-        center1 = [100, -20]
-        radii1 = 20
+        ########### pt. b ############
+
+        # Lane B: Inner Lane
         net.add_lane(
             "b",
             "c",
+            StraightLane(
+                [14.6, 0],
+                [30.2, 0],
+                line_types=(LineType.NONE, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane B: Outer Lane
+        net.add_lane(
+            "b",
+            "c",
+            StraightLane(
+                [14.6, 5],
+                [30.2, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        ########### pt. c ############
+
+        # Lane C: Inner Lane
+        net.add_lane(
+            "c",
+            "d",
+            StraightLane(
+                [30.2, 0],
+                [100, 0],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane C: Outer Lane
+        net.add_lane(
+            "c",
+            "d",
+            StraightLane(
+                [30.2, 5],
+                [100, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        ########### pt. d ############
+
+        # Lane D: Inner Lane
+        net.add_lane(
+            "d",
+            "e",
+            StraightLane(
+                [100, 0],
+                [110, 0],
+                line_types=(LineType.NONE, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane D: Outer Lane
+        net.add_lane(
+            "d",
+            "e",
+            StraightLane(
+                [100, 5],
+                [110, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        ########### pt. e ############
+
+        # Lane E: Inner Lane
+        net.add_lane(
+            "e",
+            "f",
+            StraightLane(
+                [110, 0],
+                [140, 0],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane E: Outer Lane
+        net.add_lane(
+            "e",
+            "f",
+            StraightLane(
+                [110, 5],
+                [140, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        # Lane F: Inner Lane
+        net.add_lane(
+            "f",
+            "g",
+            StraightLane(
+                [140, 0],
+                [150, 0],
+                line_types=(LineType.NONE, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane F: Outer Lane
+        net.add_lane(
+            "f",
+            "g",
+            StraightLane(
+                [140, 5],
+                [150, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        # Lane G: Inner Lane
+        net.add_lane(
+            "g",
+            "h",
+            StraightLane(
+                [150, 0],
+                [180, 0],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane G: Outer Lane
+        net.add_lane(
+            "g",
+            "h",
+            StraightLane(
+                [150, 5],
+                [180, 5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+        # Turn H: Inner Lane
+        center1 = [180, 25]
+        radii1 = 20
+        net.add_lane(
+            "h",
+            "i",
             CircularLane(
                 center1,
                 radii1,
-                np.deg2rad(90),
+                np.deg2rad(-90),
                 np.deg2rad(0),
                 width=5,
-                clockwise=False,
-                line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                clockwise=True,
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6] + extra_speed[0],
             ),
         )
 
-        # Turn 1: Outter Lane
+        # Turn H: Outer Lane
         net.add_lane(
-            "b",
-            "c",
+            "h",
+            "i",
             CircularLane(
                 center1,
                 radii1 + 5,
-                np.deg2rad(90),
+                np.deg2rad(-90),
                 np.deg2rad(0),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        # Lane I - Inner Lane
+        net.add_lane(
+            "i",
+            "j",
+            StraightLane(
+                [200, 24],
+                [200, 36],
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Lane G - Outer Lane
+        net.add_lane(
+            "i",
+            "j",
+            StraightLane(
+                [205, 25],
+                [205, 36],
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Turn J: Inner Lane
+        center2 = [180, 35]
+        radii2 = 20
+        net.add_lane(
+            "j",
+            "k",
+            CircularLane(
+                center2,
+                radii2,
+                np.deg2rad(0),
+                np.deg2rad(90),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6] + extra_speed[0],
+            ),
+        )
+
+        # Turn J: Outer Lane
+        net.add_lane(
+            "j",
+            "k",
+            CircularLane(
+                center2,
+                radii2 + 5,
+                np.deg2rad(0),
+                np.deg2rad(90),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        # Lane K: Inner Lane
+        net.add_lane(
+            "k",
+            "l",
+            StraightLane(
+                [180, 55],
+                [0, 55],
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5]  + extra_speed[0],
+            ),
+        )
+
+        # Lane K: Outer Lane
+        net.add_lane(
+            "k",
+            "l",
+            StraightLane(
+                [180, 60],
+                [0, 60],
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
+
+
+        # Turn L: Inner Lane
+        center3 = [0, 35]
+        radii3 = 20
+        net.add_lane(
+            "l",
+            "m",
+            CircularLane(
+                center3,
+                radii3,
+                np.deg2rad(90),
+                np.deg2rad(180),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6] + extra_speed[0],
+            ),
+        )
+
+        # Turn L: Outer Lane
+        net.add_lane(
+            "l",
+            "m",
+            CircularLane(
+                center3,
+                radii3 + 5,
+                np.deg2rad(90),
+                np.deg2rad(180),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        # Lane M - Inner Lane
+        net.add_lane(
+            "m",
+            "n",
+            StraightLane(
+                [-20, 36],
+                [-20, 25],
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Lane M - Outer Lane
+        net.add_lane(
+            "m",
+            "n",
+            StraightLane(
+                [-25, 36],
+                [-25, 25],
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Turn N: Inner Lane
+        center4 = [0, 25]
+        radii4 = 20
+        net.add_lane(
+            "n",
+            "a",
+            CircularLane(
+                center4,
+                radii4,
+                np.deg2rad(180),
+                np.deg2rad(270),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.NONE, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6] + extra_speed[0],
+            ),
+        )
+
+        # Turn N: Outer Lane
+        net.add_lane(
+            "n",
+            "a",
+            CircularLane(
+                center4,
+                radii4 + 5,
+                np.deg2rad(180),
+                np.deg2rad(270),
+                width=5,
+                clockwise=True,
+                line_types=(LineType.CONTINUOUS, LineType.STRIPED),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        #### NOW THE FIRST DEVIATION (shorter upper loop)
+
+        # Lane O - Inner Lane
+        net.add_lane(
+            "e",
+            "o",
+            StraightLane(
+                [102.5, -2.5],
+                [102.5, -33.5],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Lane O - Outer Lane
+        net.add_lane(
+            "e",
+            "o",
+            StraightLane(
+                [107.5, -2.5],
+                [107.5, -33.5],
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[3],
+            ),
+        )
+
+        # Turn P - Inner Lane
+        center5 = [82.5, -32.5]
+        radii5 = 20
+        net.add_lane(
+            "o",
+            "p",
+            CircularLane(
+                center5,
+                radii5,
+                np.deg2rad(0),
+                np.deg2rad(-90),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[4],
+            ),
+        )
+
+        # Turn P - Outer Lane
+        net.add_lane(
+            "o",
+            "p",
+            CircularLane(
+                center5,
+                radii5 + 5,
+                np.deg2rad(0),
+                np.deg2rad(-90),
                 width=5,
                 clockwise=False,
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
-                speed_limit=speedlimits[2],
+                speed_limit=speedlimits[4],
             ),
         )
 
-        # Vertical Straight 1: Inner Lane
+        # Lane Q: Inner Lane
         net.add_lane(
-            "c",
-            "d",
+            "p",
+            "q",
             StraightLane(
-                [100 + 20, -20],
-                [100 + 20, -30],
+                [82.5, -52.5],
+                [20, -52.5],
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[3] + extra_speed[0],
+                speed_limit=speedlimits[5]  + extra_speed[0],
             ),
         )
 
-        # Vertical Straight 1: Outter Lane
-        net.add_lane("c", "d", lane)
+        # Lane Q: Outer Lane
         net.add_lane(
-            "c",
-            "d",
+            "p",
+            "q",
             StraightLane(
-                [100 + 20 + 5, -20],
-                [100 + 20 + 5, -30],
+                [82.5, -57.5],
+                [20, -57.5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1],
+                speed_limit=speedlimits[5],
             ),
         )
 
+        # Turn R: Inner Lane
+        center6 = [20, -32.5]
+        radii6 = 20
+        net.add_lane(
+            "q",
+            "r",
+            CircularLane(
+                center6,
+                radii6,
+                np.deg2rad(-90),
+                np.deg2rad(-180),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[6] + extra_speed[0],
+            ),
+        )
+
+        # Turn R: Outer Lane
+        net.add_lane(
+            "q",
+            "r",
+            CircularLane(
+                center6,
+                radii6 + 5,
+                np.deg2rad(-90),
+                np.deg2rad(-180),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        # Turn S: Inner Lane
+        center7 = [20, -32.5]
+        radii7 = 20
+        net.add_lane(
+            "r",
+            "s",
+            CircularLane(
+                center7,
+                radii7,
+                np.deg2rad(-180),
+                np.deg2rad(-225),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[6] + extra_speed[0],
+            ),
+        )
+
+        # Turn S: Outer Lane
+        net.add_lane(
+            "R",
+            "S",
+            CircularLane(
+                center7,
+                radii7 + 5,
+                np.deg2rad(-180),
+                np.deg2rad(-225),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[6],
+            ),
+        )
+
+        # Lane T: Inner Lane
+        net.add_lane(
+            "s",
+            "b",
+            StraightLane(
+                [6.1, -18.3],                  # [(20+20*cos(pi/4)), -32.5 + 20*sin(pi/4)]
+                [29 , -0.5],                                            # [(15+25*cos(pi/4)), -32.5 + 25*sin(pi/4)]
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
+                speed_limit=speedlimits[5] + extra_speed[0],
+            ),
+        )
+
+        # Lane T: Outer Lane
+        net.add_lane(
+            "s",
+            "b",
+            StraightLane(
+                [2.2, -14.9],                    # [15+25*cos(pi/4), -32.5 + 25*sin(pi/4)]
+                [15.3, -4.7],                    # [-(10+30*cos(pi/4)), -32.5 + 25*sin(pi/4)]
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                width=5,
+                speed_limit=speedlimits[5],
+            ),
+        )
 
         road = Road(
             network=net,
