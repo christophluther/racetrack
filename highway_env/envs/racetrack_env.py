@@ -57,8 +57,8 @@ class RacetrackEnv(AbstractEnv):
                 "action_reward": -0.3,
                 "controlled_vehicles": 1,
                 "other_vehicles": 1,
-                "screen_width": 600,
-                "screen_height": 600,
+                "screen_width": 1000,
+                "screen_height": 1000,
                 "centering_position": [0.5, 0.5],
                 "new_reward": True,                 # CL: Created new reward function; used if int
                 "restrict_init_collision": 20,      # CL: Change the distance to prevent init collision
@@ -71,6 +71,8 @@ class RacetrackEnv(AbstractEnv):
                 "scenario_1": False,                # CL: Custom scenario 1
                 "length_v1": 200,                   # CL: length of track for v1
                 "max_objects": 4,                   # CL: maximum number of objects per lane
+                "rand_indicator": False,            # CL: indicator blocks per default same status as block, True: rand
+                "prob": 0.5,
             }
         )
         return config
@@ -1124,10 +1126,10 @@ class RacetrackEnvV2(RacetrackEnv):
         # Lane A: Initialise First Inner Lane
         lane = StraightLane(
             [-0.2, 0],
-            [14.6, 0],
+            [14.4, 0],
             line_types=(LineType.CONTINUOUS, LineType.STRIPED),
             width=5,
-            speed_limit=speedlimits[1] + extra_speed[0],
+            speed_limit=speedlimits[1],
         )
         self.lane = lane
 
@@ -1137,11 +1139,11 @@ class RacetrackEnvV2(RacetrackEnv):
             "a",
             "b",
             StraightLane(
-                [-0.2, 5],
+                [-0.7, 5],
                 [14.6, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1],
+                speed_limit=speedlimits[1]  + extra_speed[0],
             ),
         )
 
@@ -1152,11 +1154,11 @@ class RacetrackEnvV2(RacetrackEnv):
             "b",
             "c",
             StraightLane(
-                [14.6, 0],
+                [14.1, 0],
                 [30.2, 0],
                 line_types=(LineType.NONE, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
+                speed_limit=speedlimits[1],
             ),
         )
 
@@ -1169,7 +1171,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [30.2, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1]  + extra_speed[0],
             ),
         )
 
@@ -1181,10 +1183,10 @@ class RacetrackEnvV2(RacetrackEnv):
             "d",
             StraightLane(
                 [30.2, 0],
-                [100, 0],
+                [92.6, 0],
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
+                speed_limit=speedlimits[1],
             ),
         )
 
@@ -1194,10 +1196,10 @@ class RacetrackEnvV2(RacetrackEnv):
             "d",
             StraightLane(
                 [30.2, 5],
-                [100, 5],
+                [93.1, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1]  + extra_speed[0],
             ),
         )
 
@@ -1208,11 +1210,11 @@ class RacetrackEnvV2(RacetrackEnv):
             "d",
             "e",
             StraightLane(
-                [100, 0],
-                [110, 0],
+                [92.6, 0],
+                [109.5, 0],
                 line_types=(LineType.NONE, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
+                speed_limit=speedlimits[1],
             ),
         )
 
@@ -1221,11 +1223,11 @@ class RacetrackEnvV2(RacetrackEnv):
             "d",
             "e",
             StraightLane(
-                [100, 5],
+                [93.1, 5],
                 [110, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1]  + extra_speed[0],
             ),
         )
 
@@ -1236,11 +1238,11 @@ class RacetrackEnvV2(RacetrackEnv):
             "e",
             "f",
             StraightLane(
-                [110, 0],
-                [140, 0],
+                [109, 0],
+                [180, 0],
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
+                speed_limit=speedlimits[1],
             ),
         )
 
@@ -1250,71 +1252,71 @@ class RacetrackEnvV2(RacetrackEnv):
             "f",
             StraightLane(
                 [110, 5],
-                [140, 5],
-                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
-                width=5,
-                speed_limit=speedlimits[5],
-            ),
-        )
-
-        # Lane F: Inner Lane
-        net.add_lane(
-            "f",
-            "g",
-            StraightLane(
-                [140, 0],
-                [150, 0],
-                line_types=(LineType.NONE, LineType.NONE),
-                width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
-            ),
-        )
-
-        # Lane F: Outer Lane
-        net.add_lane(
-            "f",
-            "g",
-            StraightLane(
-                [140, 5],
-                [150, 5],
-                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
-                width=5,
-                speed_limit=speedlimits[5],
-            ),
-        )
-
-        # Lane G: Inner Lane
-        net.add_lane(
-            "g",
-            "h",
-            StraightLane(
-                [150, 0],
-                [180, 0],
-                line_types=(LineType.CONTINUOUS, LineType.NONE),
-                width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
-            ),
-        )
-
-        # Lane G: Outer Lane
-        net.add_lane(
-            "g",
-            "h",
-            StraightLane(
-                [150, 5],
                 [180, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1]  + extra_speed[0],
             ),
         )
 
-        # Turn H: Inner Lane
+        # # Lane F: Inner Lane
+        # net.add_lane(
+        #     "f",
+        #     "g",
+        #     StraightLane(
+        #         [140, 0],
+        #         [150, 0],
+        #         line_types=(LineType.NONE, LineType.NONE),
+        #         width=5,
+        #         speed_limit=speedlimits[5]  + extra_speed[0],
+        #     ),
+        # )
+#
+        # # Lane F: Outer Lane
+        # net.add_lane(
+        #     "f",
+        #     "g",
+        #     StraightLane(
+        #         [140, 5],
+        #         [150, 5],
+        #         line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+        #         width=5,
+        #         speed_limit=speedlimits[5],
+        #     ),
+        # )
+#
+        # # Lane G: Inner Lane
+        # net.add_lane(
+        #     "g",
+        #     "h",
+        #     StraightLane(
+        #         [150, 0],
+        #         [180, 0],
+        #         line_types=(LineType.CONTINUOUS, LineType.NONE),
+        #         width=5,
+        #         speed_limit=speedlimits[5]  + extra_speed[0],
+        #     ),
+        # )
+#
+        # # Lane G: Outer Lane
+        # net.add_lane(
+        #     "g",
+        #     "h",
+        #     StraightLane(
+        #         [150, 5],
+        #         [180, 5],
+        #         line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+        #         width=5,
+        #         speed_limit=speedlimits[5],
+        #     ),
+        # )
+
+        # Turn F: Inner Lane
         center1 = [180, 25]
         radii1 = 20
         net.add_lane(
-            "h",
-            "i",
+            "f",
+            "g",
             CircularLane(
                 center1,
                 radii1,
@@ -1323,14 +1325,14 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6] + extra_speed[0],
+                speed_limit=speedlimits[2],
             ),
         )
 
-        # Turn H: Outer Lane
+        # Turn F: Outer Lane
         net.add_lane(
-            "h",
-            "i",
+            "f",
+            "g",
             CircularLane(
                 center1,
                 radii1 + 5,
@@ -1339,42 +1341,42 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
-                speed_limit=speedlimits[6],
+                speed_limit=speedlimits[2] + extra_speed[0],
             ),
         )
 
-        # Lane I - Inner Lane
+        # Lane G - Inner Lane
         net.add_lane(
-            "i",
-            "j",
+            "g",
+            "h",
             StraightLane(
                 [200, 24],
                 [200, 36],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1],
             ),
         )
 
         # Lane G - Outer Lane
         net.add_lane(
-            "i",
-            "j",
+            "g",
+            "h",
             StraightLane(
                 [205, 25],
                 [205, 36],
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
-        # Turn J: Inner Lane
+        # Turn H: Inner Lane
         center2 = [180, 35]
         radii2 = 20
         net.add_lane(
-            "j",
-            "k",
+            "h",
+            "i",
             CircularLane(
                 center2,
                 radii2,
@@ -1383,14 +1385,14 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6] + extra_speed[0],
+                speed_limit=speedlimits[2],
             ),
         )
 
-        # Turn J: Outer Lane
+        # Turn H: Outer Lane
         net.add_lane(
-            "j",
-            "k",
+            "h",
+            "i",
             CircularLane(
                 center2,
                 radii2 + 5,
@@ -1399,43 +1401,43 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
-                speed_limit=speedlimits[6],
+                speed_limit=speedlimits[2] + extra_speed[0],
             ),
         )
 
-        # Lane K: Inner Lane
+        # Lane I: Inner Lane
         net.add_lane(
-            "k",
-            "l",
+            "i",
+            "j",
             StraightLane(
-                [180, 55],
+                [180.5, 55],
                 [0, 55],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
+                speed_limit=speedlimits[3] + extra_speed[0],
             ),
         )
 
-        # Lane K: Outer Lane
+        # Lane I: Outer Lane
         net.add_lane(
-            "k",
-            "l",
+            "i",
+            "j",
             StraightLane(
                 [180, 60],
                 [0, 60],
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
 
-        # Turn L: Inner Lane
+        # Turn J: Inner Lane
         center3 = [0, 35]
         radii3 = 20
         net.add_lane(
-            "l",
-            "m",
+            "j",
+            "k",
             CircularLane(
                 center3,
                 radii3,
@@ -1444,14 +1446,14 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6] + extra_speed[0],
+                speed_limit=speedlimits[2],
             ),
         )
 
-        # Turn L: Outer Lane
+        # Turn J: Outer Lane
         net.add_lane(
-            "l",
-            "m",
+            "j",
+            "k",
             CircularLane(
                 center3,
                 radii3 + 5,
@@ -1460,41 +1462,41 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
-                speed_limit=speedlimits[6],
+                speed_limit=speedlimits[2] + extra_speed[0],
             ),
         )
 
-        # Lane M - Inner Lane
+        # Lane K - Inner Lane
         net.add_lane(
-            "m",
-            "n",
+            "k",
+            "l",
             StraightLane(
                 [-20, 36],
                 [-20, 25],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1],
             ),
         )
 
-        # Lane M - Outer Lane
+        # Lane K - Outer Lane
         net.add_lane(
-            "m",
-            "n",
+            "k",
+            "l",
             StraightLane(
                 [-25, 36],
                 [-25, 25],
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
-        # Turn N: Inner Lane
+        # Turn L: Inner Lane
         center4 = [0, 25]
         radii4 = 20
         net.add_lane(
-            "n",
+            "l",
             "a",
             CircularLane(
                 center4,
@@ -1504,13 +1506,13 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6] + extra_speed[0],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
-        # Turn N: Outer Lane
+        # Turn L: Outer Lane
         net.add_lane(
-            "n",
+            "l",
             "a",
             CircularLane(
                 center4,
@@ -1520,113 +1522,181 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.CONTINUOUS, LineType.STRIPED),
-                speed_limit=speedlimits[6],
+                speed_limit=speedlimits[1],
             ),
         )
 
         #### NOW THE FIRST DEVIATION (shorter upper loop)
 
-        # Lane O - Inner Lane
+        # Lane M - Inner Lane
         net.add_lane(
             "e",
-            "o",
+            "m",
             StraightLane(
-                [102.5, -2.5],
-                [102.5, -33.5],
+                [93.8, -0.5],
+                [116.7, -18.3],
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
-        # Lane O - Outer Lane
+        # Lane M - Outer Lane
         net.add_lane(
             "e",
-            "o",
+            "m",
             StraightLane(
-                [107.5, -2.5],
-                [107.5, -33.5],
+                [107.5, -4.7],
+                [120.6, -14.9],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[3],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
-        # Turn P - Inner Lane
-        center5 = [82.5, -32.5]
+        # Turn N: Inner Lane
+        center5 = [102.8, -32.5]
         radii5 = 20
         net.add_lane(
-            "o",
-            "p",
+            "m",
+            "n",
             CircularLane(
                 center5,
                 radii5,
+                np.deg2rad(45),
                 np.deg2rad(0),
-                np.deg2rad(-90),
                 width=5,
                 clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[4],
+                speed_limit=speedlimits[2],
             ),
         )
 
-        # Turn P - Outer Lane
+        # Turn N: Outer Lane
         net.add_lane(
-            "o",
-            "p",
+            "m",
+            "n",
             CircularLane(
                 center5,
                 radii5 + 5,
+                np.deg2rad(45),
+                np.deg2rad(0),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[2] + extra_speed[0],
+            ),
+        )
+
+        # Turn O - Inner Lane
+        center6 = [102.8, -32.5]
+        radii6 = 20
+        net.add_lane(
+            "n",
+            "o",
+            CircularLane(
+                center6,
+                radii6,
+                np.deg2rad(0),
+                np.deg2rad(-90),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[2],
+            ),
+        )
+
+        # Turn O - Outer Lane
+        net.add_lane(
+            "n",
+            "o",
+            CircularLane(
+                center6,
+                radii6 + 5,
                 np.deg2rad(0),
                 np.deg2rad(-90),
                 width=5,
                 clockwise=False,
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[2] + extra_speed[0],
+            ),
+        )
+
+        # Lane P: Inner Lane
+        net.add_lane(
+            "o",
+            "p",
+            StraightLane(
+                [103.3, -52.5],
+                [20, -52.5],
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                width=5,
                 speed_limit=speedlimits[4],
             ),
         )
 
-        # Lane Q: Inner Lane
+        # Lane P: Outer Lane
         net.add_lane(
+            "o",
             "p",
-            "q",
             StraightLane(
-                [82.5, -52.5],
-                [20, -52.5],
-                line_types=(LineType.CONTINUOUS, LineType.NONE),
-                width=5,
-                speed_limit=speedlimits[5]  + extra_speed[0],
-            ),
-        )
-
-        # Lane Q: Outer Lane
-        net.add_lane(
-            "p",
-            "q",
-            StraightLane(
-                [82.5, -57.5],
+                [102.8, -57.5],
                 [20, -57.5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[4] + extra_speed[0],
             ),
         )
 
-        # Turn R: Inner Lane
-        center6 = [20, -32.5]
-        radii6 = 20
+        # Turn Q: Inner Lane
+        center7 = [20, -32.5]
+        radii7 = 20
         net.add_lane(
+            "p",
             "q",
-            "r",
             CircularLane(
-                center6,
-                radii6,
+                center7,
+                radii7,
+                np.deg2rad(-90),
+                np.deg2rad(-182),
+                width=5,
+                clockwise=False,
+                line_types=(LineType.CONTINUOUS, LineType.NONE),
+                speed_limit=speedlimits[2],
+            ),
+        )
+
+        # Turn Q: Outer Lane
+        net.add_lane(
+            "p",
+            "q",
+            CircularLane(
+                center7,
+                radii7 + 5,
                 np.deg2rad(-90),
                 np.deg2rad(-180),
                 width=5,
                 clockwise=False,
+                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
+                speed_limit=speedlimits[2] + extra_speed[0],
+            ),
+        )
+
+        # Turn R: Inner Lane
+        center8 = [20, -32.5]
+        radii8 = 20
+        net.add_lane(
+            "q",
+            "r",
+            CircularLane(
+                center8,
+                radii8,
+                np.deg2rad(-178),
+                np.deg2rad(-225),
+                width=5,
+                clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[6] + extra_speed[0],
+                speed_limit=speedlimits[2],
             ),
         )
 
@@ -1635,74 +1705,40 @@ class RacetrackEnvV2(RacetrackEnv):
             "q",
             "r",
             CircularLane(
-                center6,
-                radii6 + 5,
-                np.deg2rad(-90),
+                center8,
+                radii8 + 5,
                 np.deg2rad(-180),
+                np.deg2rad(-225),
                 width=5,
                 clockwise=False,
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6],
+                speed_limit=speedlimits[2] + extra_speed[0],
             ),
         )
 
-        # Turn S: Inner Lane
-        center7 = [20, -32.5]
-        radii7 = 20
+        # Lane S: Inner Lane
         net.add_lane(
             "r",
-            "s",
-            CircularLane(
-                center7,
-                radii7,
-                np.deg2rad(-180),
-                np.deg2rad(-225),
-                width=5,
-                clockwise=False,
-                line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[6] + extra_speed[0],
-            ),
-        )
-
-        # Turn S: Outer Lane
-        net.add_lane(
-            "R",
-            "S",
-            CircularLane(
-                center7,
-                radii7 + 5,
-                np.deg2rad(-180),
-                np.deg2rad(-225),
-                width=5,
-                clockwise=False,
-                line_types=(LineType.STRIPED, LineType.CONTINUOUS),
-                speed_limit=speedlimits[6],
-            ),
-        )
-
-        # Lane T: Inner Lane
-        net.add_lane(
-            "s",
             "b",
             StraightLane(
                 [6.1, -18.3],                  # [(20+20*cos(pi/4)), -32.5 + 20*sin(pi/4)]
                 [29 , -0.5],                                            # [(15+25*cos(pi/4)), -32.5 + 25*sin(pi/4)]
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[5] + extra_speed[0],
+                speed_limit=speedlimits[1],
             ),
         )
 
-        # Lane T: Outer Lane
+        # Lane S: Outer Lane
         net.add_lane(
-            "s",
+            "r",
             "b",
             StraightLane(
                 [2.2, -14.9],                    # [15+25*cos(pi/4), -32.5 + 25*sin(pi/4)]
                 [15.3, -4.7],                    # [-(10+30*cos(pi/4)), -32.5 + 25*sin(pi/4)]
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[5],
+                speed_limit=speedlimits[1] + extra_speed[0],
             ),
         )
 
@@ -1712,3 +1748,99 @@ class RacetrackEnvV2(RacetrackEnv):
             record_history=self.config["show_trajectories"],
         )
         self.road = road
+
+        # Place random objects on racetrack v2
+        if self.config["rand_object"] is not None:
+
+            if self.config["rand_object"] == 0:
+                no_obj = rng_int.integers(1, high=2 * self.config["max_objects"])
+            else:
+                no_obj = np.min([self.config["rand_object"], no_lanes*self.config["max_objects"]])
+
+            j = 0
+            while j < no_obj:
+                # choose lane
+                lane = rng.choice(range(0, 2, 1))
+                # chose segment (one of the four straights)
+                segment = rng.choice(range(0, 3, 1))
+                if segment == 0:
+                    longi = rng.uniform(1, 180)
+                    obstacle = Obstacle(self.road, [longi, 5*lane])
+                    self.road.objects.append(obstacle)
+                elif segment == 1:
+                    longi = rng.uniform(1, 180)
+                    obstacle = Obstacle(self.road, [longi, 55 + 5*lane])
+                    self.road.objects.append(obstacle)
+                elif segment == 2:
+                    longi = rng.uniform(21, 102)
+                    obstacle = Obstacle(self.road, [longi, -52.5-(5*lane)])
+                    self.road.objects.append(obstacle)
+                else:
+                    pass
+                j+=1
+
+        # Block the highspeed lane
+
+        # place the roadblocks in pt. G
+
+        # draw status of roadblocks
+        block_one = np.random.binomial(1, self.config["prob"])
+        block_two = np.random.binomial(1, self.config["prob"])
+
+        if block_one == 1:
+
+            obstacle_0 = Obstacle(self.road, [200,30])
+            self.road.objects.append(obstacle_0)
+
+            if self.config["rand_indicator"] is True:
+
+                indicator_1 = np.random.binomial(1, 0.9)
+
+                if indicator_1 == 1:
+                    obstacle_1 = Obstacle(self.road, [70,-5])
+                    self.road.objects.append(obstacle_1)
+                else:
+                    pass
+
+            else:
+                obstacle_1 = Obstacle(self.road, [70,-5])
+                self.road.objects.append(obstacle_1)
+
+        else:
+            if self.config["rand_indicator"] is True:
+                indicator_1 = np.random.binomial(1, 0.1)
+
+                if indicator_1 == 1:
+                    obstacle_1 = Obstacle(self.road, [70,-5])
+                    self.road.objects.append(obstacle_1)
+                else:
+                    pass
+
+        if block_two == 1:
+
+            obstacle_2 = Obstacle(self.road, [205, 30])
+            self.road.objects.append(obstacle_2)
+
+            if self.config["rand_indicator"] is True:
+
+                indicator_2 = np.random.binomial(1, 0.9)
+
+                if indicator_2 == 1:
+                    obstacle_3 = Obstacle(self.road, [75, -5])
+                    self.road.objects.append(obstacle_3)
+                else:
+                    pass
+
+            else:
+                obstacle_3 = Obstacle(self.road, [75, -5])
+                self.road.objects.append(obstacle_3)
+
+        else:
+            if self.config["rand_indicator"] is True:
+                indicator_2 = np.random.binomial(1, 0.1)
+
+                if indicator_2 == 1:
+                    obstacle_3 = Obstacle(self.road, [75, -5])
+                    self.road.objects.append(obstacle_3)
+                else:
+                    pass
