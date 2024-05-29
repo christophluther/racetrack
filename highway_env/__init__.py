@@ -105,6 +105,12 @@ def register_highway_envs():
         entry_point='highway_env.envs:RacetrackEnvV1',
     )
 
+    # CL:
+    register(
+        id='racetrack-v2',
+        entry_point='highway_env.envs:RacetrackEnvV2',
+    )
+
     # roundabout_env.py
     register(
         id="roundabout-v0",
