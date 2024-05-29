@@ -73,6 +73,7 @@ class RacetrackEnv(AbstractEnv):
                 "max_objects": 4,                   # CL: maximum number of objects per lane
                 "rand_indicator": False,            # CL: indicator blocks per default same status as block, True: rand
                 "prob": 0.5,
+                "reward_speed_range": [20, 30],
             }
         )
         return config
