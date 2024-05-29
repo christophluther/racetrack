@@ -1819,59 +1819,39 @@ class RacetrackEnvV2(RacetrackEnv):
         block_two = np.random.binomial(1, self.config["prob"])
 
         if block_one == 1:
-
             obstacle_0 = Obstacle(self.road, [200,30])
             self.road.objects.append(obstacle_0)
-
             if self.config["rand_indicator"] is True:
-
                 indicator_1 = np.random.binomial(1, 0.9)
-
                 if indicator_1 == 1:
                     obstacle_1 = Obstacle(self.road, [70,-5])
                     self.road.objects.append(obstacle_1)
-                else:
-                    pass
-
             else:
                 obstacle_1 = Obstacle(self.road, [70,-5])
                 self.road.objects.append(obstacle_1)
 
-        else:
+        if block_one == 0:
             if self.config["rand_indicator"] is True:
                 indicator_1 = np.random.binomial(1, 0.1)
-
                 if indicator_1 == 1:
                     obstacle_1 = Obstacle(self.road, [70,-5])
                     self.road.objects.append(obstacle_1)
-                else:
-                    pass
 
         if block_two == 1:
-
             obstacle_2 = Obstacle(self.road, [205, 30])
             self.road.objects.append(obstacle_2)
-
             if self.config["rand_indicator"] is True:
-
                 indicator_2 = np.random.binomial(1, 0.9)
-
                 if indicator_2 == 1:
                     obstacle_3 = Obstacle(self.road, [75, -5])
                     self.road.objects.append(obstacle_3)
-                else:
-                    pass
-
             else:
                 obstacle_3 = Obstacle(self.road, [75, -5])
                 self.road.objects.append(obstacle_3)
 
-        else:
+        if block_two == 0:
             if self.config["rand_indicator"] is True:
                 indicator_2 = np.random.binomial(1, 0.1)
-
                 if indicator_2 == 1:
                     obstacle_3 = Obstacle(self.road, [75, -5])
                     self.road.objects.append(obstacle_3)
-                else:
-                    pass
