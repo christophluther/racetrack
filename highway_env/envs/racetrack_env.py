@@ -1173,7 +1173,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [14.6, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]  + extra_speed[0],
+                speed_limit=speedlimits[1]  + extra_speed[2],
             ),
         )
 
@@ -1201,7 +1201,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [30.2, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]  + extra_speed[0],
+                speed_limit=speedlimits[1]  + extra_speed[2],
             ),
         )
 
@@ -1229,7 +1229,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [93.1, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]  + extra_speed[0],
+                speed_limit=speedlimits[1]  + extra_speed[2],
             ),
         )
 
@@ -1257,7 +1257,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [110, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]  + extra_speed[0],
+                speed_limit=speedlimits[1]  + extra_speed[2],
             ),
         )
 
@@ -1285,7 +1285,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [180, 5],
                 line_types=(LineType.STRIPED, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]  + extra_speed[0],
+                speed_limit=speedlimits[1]  + extra_speed[2],
             ),
         )
 
@@ -1355,7 +1355,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1384,7 +1384,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [200, 36],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1]+ extra_speed[0],
+                speed_limit=speedlimits[1]+ extra_speed[2],
             ),
         )
 
@@ -1415,7 +1415,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1444,7 +1444,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [0, 55],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[3] + extra_speed[0],
+                speed_limit=speedlimits[3] + extra_speed[2],
             ),
         )
 
@@ -1476,7 +1476,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1505,7 +1505,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [-20, 25],
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
                 width=5,
-                speed_limit=speedlimits[1] + extra_speed[0],
+                speed_limit=speedlimits[1] + extra_speed[2],
             ),
         )
 
@@ -1536,7 +1536,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=True,
                 line_types=(LineType.NONE, LineType.CONTINUOUS),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1567,7 +1567,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [116.7, -18.3],
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[1] + extra_speed[0],
+                speed_limit=speedlimits[1] + extra_speed[2],
             ),
         )
 
@@ -1598,7 +1598,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1632,7 +1632,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1692,7 +1692,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1726,7 +1726,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 width=5,
                 clockwise=False,
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
-                speed_limit=speedlimits[2] + extra_speed[0],
+                speed_limit=speedlimits[2] + extra_speed[2],
             ),
         )
 
@@ -1755,7 +1755,7 @@ class RacetrackEnvV2(RacetrackEnv):
                 [29 , -0.5],                                            # [(15+25*cos(pi/4)), -32.5 + 25*sin(pi/4)]
                 line_types=(LineType.CONTINUOUS, LineType.NONE),
                 width=5,
-                speed_limit=speedlimits[1] + extra_speed[0],
+                speed_limit=speedlimits[1] + extra_speed[2],
             ),
         )
 
