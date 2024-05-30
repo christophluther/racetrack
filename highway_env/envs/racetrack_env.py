@@ -1786,7 +1786,7 @@ class RacetrackEnvV2(RacetrackEnv):
             if self.config["rand_object"] == 0:
                 no_obj = rng_int.integers(1, high=2 * self.config["max_objects"])
             else:
-                no_obj = np.min([self.config["rand_object"], no_lanes*self.config["max_objects"]])
+                no_obj = np.min([self.config["rand_object"], 2*self.config["max_objects"]])
 
             j = 0
             while j < no_obj:
