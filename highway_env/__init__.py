@@ -101,13 +101,13 @@ def register_highway_envs():
 
     # CL:
     register(
-        id='racetrack-v1',
+        id='racetrack-loop',
         entry_point='highway_env.envs:RacetrackEnvV1',
     )
 
     # CL:
     register(
-        id='racetrack-v2',
+        id='racetrack-eight',
         entry_point='highway_env.envs:RacetrackEnvV2',
     )
 
