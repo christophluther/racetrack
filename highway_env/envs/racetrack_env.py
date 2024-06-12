@@ -620,7 +620,8 @@ class RacetrackEnvLarge(RacetrackEnv):
 
 class RacetrackEnvV1(RacetrackEnv):
     """
-    A variant of racetrack-v0 with more lanes:
+    A variant of racetrack-v0 with more lanes and a loop:
+    Actual name racetrack-loop
     """
     def _make_road(self) -> None:
         net = RoadNetwork()
@@ -1048,28 +1049,31 @@ class RacetrackEnvV1(RacetrackEnv):
         self.road = road
 
         if self.config["scenario_1"]:
+            if length_v1 < 90:
+                print("Warning: Track too short for scenario, you may want to consider longer track")
+
             # Still obstacle
-            obstacle_0 = Obstacle(self.road, [length_v1-60,0])
+            obstacle_0 = Obstacle(self.road, [length_v1-10,0])
             self.road.objects.append(obstacle_0)
 
             # Still obstacle
-            obstacle_1 = Obstacle(self.road, [length_v1-90,5])
+            obstacle_1 = Obstacle(self.road, [length_v1-30,5])
             self.road.objects.append(obstacle_1)
 
             # Still obstacle
-            obstacle_2 = Obstacle(self.road, [length_v1-130,10])
+            obstacle_2 = Obstacle(self.road, [length_v1-60,10])
             self.road.objects.append(obstacle_2)
 
             # Still obstacle
-            obstacle_3 = Obstacle(self.road, [length_v1-60, 10])
+            obstacle_3 = Obstacle(self.road, [length_v1-10, 10])
             self.road.objects.append(obstacle_3)
 
             # Still obstacle
-            obstacle_4 = Obstacle(self.road, [length_v1-100, 15])
+            obstacle_4 = Obstacle(self.road, [length_v1-40, 15])
             self.road.objects.append(obstacle_4)
 
             # Still obstacle
-            obstacle_5 = Obstacle(self.road, [length_v1-80, 20])
+            obstacle_5 = Obstacle(self.road, [length_v1-20, 20])
             self.road.objects.append(obstacle_5)
 
         if self.config["rand_object"] is not None:
@@ -1122,14 +1126,14 @@ class RacetrackEnvV1(RacetrackEnv):
 
             # crashe
             # Front vehicle
-            vehicle_1 = IDMVehicle.make_on_lane(self.road, ("a", "b", 0), longitudinal=20, speed=12)
-            self.road.vehicles.append(vehicle_1)
-            vehicle_2 = IDMVehicle.make_on_lane(self.road, ("a", "b", 1), longitudinal=20, speed=12)
-            self.road.vehicles.append(vehicle_2)
-            vehicle_3 = IDMVehicle.make_on_lane(self.road, ("a", "b", 5), longitudinal=50, speed=11)
-            self.road.vehicles.append(vehicle_3)
-            vehicle_4 = IDMVehicle.make_on_lane(self.road, ("a", "b", 7), longitudinal=40, speed=11)
-            self.road.vehicles.append(vehicle_4)
+            # vehicle_1 = IDMVehicle.make_on_lane(self.road, ("a", "b", 0), longitudinal=20, speed=12)
+            # self.road.vehicles.append(vehicle_1)
+            # vehicle_2 = IDMVehicle.make_on_lane(self.road, ("a", "b", 1), longitudinal=20, speed=12)
+            # self.road.vehicles.append(vehicle_2)
+            # vehicle_3 = IDMVehicle.make_on_lane(self.road, ("a", "b", 5), longitudinal=50, speed=11)
+            # self.road.vehicles.append(vehicle_3)
+            # vehicle_4 = IDMVehicle.make_on_lane(self.road, ("a", "b", 7), longitudinal=40, speed=11)
+            # self.road.vehicles.append(vehicle_4)
 
             # works fine
             # vehicle_1 = IDMVehicle.make_on_lane(self.road, ("a", "b", 1), longitudinal=20, speed=11)
