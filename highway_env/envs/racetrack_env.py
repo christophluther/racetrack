@@ -51,7 +51,7 @@ class RacetrackEnv(AbstractEnv):
                 "simulation_frequency": 15,
                 "policy_frequency": 5,
                 "duration": 300,
-                "collision_reward": -1,
+                "collision_reward": 1000,
                 "lane_centering_cost": 4,
                 "lane_centering_reward": 1,
                 "action_reward": -0.3,
