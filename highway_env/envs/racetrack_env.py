@@ -74,6 +74,7 @@ class RacetrackEnv(AbstractEnv):
                 "rand_indicator": False,            # CL: indicator blocks per default same status as block, True: rand
                 "prob": 0.5,
                 "reward_speed_range": [20, 30],
+                "spawns": False,
             }
         )
         return config
@@ -419,10 +420,8 @@ class RacetrackEnv(AbstractEnv):
                 self.road.network.random_lane_index(rng)
             controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
                                                                              longitudinal=rng.uniform(20, 50))
-
             self.controlled_vehicles.append(controlled_vehicle)
             self.road.vehicles.append(controlled_vehicle)
-
         # Front vehicle
         vehicle = IDMVehicle.make_on_lane(self.road, ("b", "c", lane_index[-1]),
                                           longitudinal=rng.uniform(
@@ -433,7 +432,7 @@ class RacetrackEnv(AbstractEnv):
         self.road.vehicles.append(vehicle)
 
         # Other vehicles
-        # CL no of other vehicles chosen randomly anyway lol
+        # CL number of other vehicles chosen randomly anyway lol
         for i in range(rng.integers(self.config["other_vehicles"])):
             random_lane_index = self.road.network.random_lane_index(rng)
             vehicle = IDMVehicle.make_on_lane(self.road, random_lane_index,
@@ -1106,6 +1105,77 @@ class RacetrackEnvV1(RacetrackEnv):
                     pass
                 j+=1
 
+
+    def _make_vehicles(self) -> None:
+        """
+        Populate a road with several vehicles on the highway and on the merging lane, as well as an ego-vehicle.
+        """
+        rng = self.np_random
+
+        if self.config["spawns"]:
+            self.controlled_vehicles = []
+            lane_index = ("a", "b", 3)
+            controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
+                                                                             longitudinal=30)
+            self.controlled_vehicles.append(controlled_vehicle)
+            self.road.vehicles.append(controlled_vehicle)
+
+            # crashe
+            # Front vehicle
+            vehicle_1 = IDMVehicle.make_on_lane(self.road, ("a", "b", 0), longitudinal=20, speed=12)
+            self.road.vehicles.append(vehicle_1)
+            vehicle_2 = IDMVehicle.make_on_lane(self.road, ("a", "b", 1), longitudinal=20, speed=12)
+            self.road.vehicles.append(vehicle_2)
+            vehicle_3 = IDMVehicle.make_on_lane(self.road, ("a", "b", 5), longitudinal=50, speed=11)
+            self.road.vehicles.append(vehicle_3)
+            vehicle_4 = IDMVehicle.make_on_lane(self.road, ("a", "b", 7), longitudinal=40, speed=11)
+            self.road.vehicles.append(vehicle_4)
+
+            # works fine
+            # vehicle_1 = IDMVehicle.make_on_lane(self.road, ("a", "b", 1), longitudinal=20, speed=11)
+            # self.road.vehicles.append(vehicle_1)
+            # vehicle_2 = IDMVehicle.make_on_lane(self.road, ("a", "b", 2), longitudinal=20, speed=11)
+            # self.road.vehicles.append(vehicle_2)
+            # vehicle_3 = IDMVehicle.make_on_lane(self.road, ("a", "b", 5), longitudinal=20, speed=10)
+            # self.road.vehicles.append(vehicle_3)
+            # vehicle_4 = IDMVehicle.make_on_lane(self.road, ("a", "b", 7), longitudinal=20, speed=10)
+            # self.road.vehicles.append(vehicle_4)
+
+        else:
+            # Controlled vehicles
+            self.controlled_vehicles = []
+            for i in range(self.config["controlled_vehicles"]):
+                lane_index = ("a", "b", rng.integers(2)) if i == 0 else \
+                    self.road.network.random_lane_index(rng)
+                controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
+                                                                                 longitudinal=rng.uniform(20, 50))
+                self.controlled_vehicles.append(controlled_vehicle)
+                self.road.vehicles.append(controlled_vehicle)
+            # Front vehicle
+            vehicle = IDMVehicle.make_on_lane(self.road, ("b", "c", lane_index[-1]),
+                                              longitudinal=rng.uniform(
+                                                  low=0,
+                                                  high=self.road.network.get_lane(("b", "c", 0)).length
+                                              ),
+                                              speed=6+rng.uniform(high=3))
+            self.road.vehicles.append(vehicle)
+
+            # Other vehicles
+            # CL number of other vehicles chosen randomly anyway lol
+            for i in range(rng.integers(self.config["other_vehicles"])):
+                random_lane_index = self.road.network.random_lane_index(rng)
+                vehicle = IDMVehicle.make_on_lane(self.road, random_lane_index,
+                                                  longitudinal=rng.uniform(
+                                                      low=0,
+                                                      high=self.road.network.get_lane(random_lane_index).length
+                                                  ),
+                                                  speed=6+rng.uniform(high=3))
+                # Prevent early collisions # CL: is now a parameter in configuration
+                for v in self.road.vehicles:
+                    if np.linalg.norm(vehicle.position - v.position) < self.config["restrict_init_collision"]:
+                        break
+                else:
+                    self.road.vehicles.append(vehicle)
 
 class RacetrackEnvV2(RacetrackEnv):
     """
