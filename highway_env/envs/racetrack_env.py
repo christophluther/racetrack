@@ -1120,7 +1120,7 @@ class RacetrackEnvV1(RacetrackEnv):
             self.controlled_vehicles = []
             lane_index = ("a", "b", 3)
             controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
-                                                                             longitudinal=30)
+                                                                             longitudinal=10)
             self.controlled_vehicles.append(controlled_vehicle)
             self.road.vehicles.append(controlled_vehicle)
 
