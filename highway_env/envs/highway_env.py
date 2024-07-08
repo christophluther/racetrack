@@ -174,3 +174,36 @@ class HighwayEnvFast(HighwayEnv):
         for vehicle in self.road.vehicles:
             if vehicle not in self.controlled_vehicles:
                 vehicle.check_collisions = False
+
+
+class HighwayEnvCustom(HighwayEnv):
+    @classmethod
+    def default_config(cls) -> dict:
+        config = super().default_config()
+        config.update({
+            "observation": {
+                "type": "Kinematics"
+            },
+            "action": {
+                "type": "DiscreteMetaAction",
+            },
+            "lanes_count": 4,
+            "vehicles_count": 50,
+            "controlled_vehicles": 1,
+            "initial_lane_id": None,
+            "duration": 40,  # [s]
+            "ego_spacing": 2,
+            "vehicles_density": 1,
+            "collision_reward": -1,    # The reward received when colliding with a vehicle.
+            "right_lane_reward": 0.1,  # The reward received when driving on the right-most lanes, linearly mapped to
+                                       # zero for other lanes.
+            "high_speed_reward": 0.4,  # The reward received when driving at full speed, linearly mapped to zero for
+                                       # lower speeds according to config["reward_speed_range"].
+            "lane_change_reward": 0,   # The reward received at each lane change action.
+            "reward_speed_range": [20, 30],
+            "normalize_reward": True,
+            "offroad_terminal": False,
+            "on_road": 1
+        })
+        return config
+
