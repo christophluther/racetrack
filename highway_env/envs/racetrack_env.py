@@ -618,7 +618,7 @@ class RacetrackEnvLarge(RacetrackEnv):
 
 
 
-class RacetrackEnvV1(RacetrackEnv):
+class RacetrackEnvLoop(RacetrackEnv):
     """
     A variant of racetrack-v0 with more lanes and a loop:
     Actual name racetrack-loop
@@ -1181,7 +1181,7 @@ class RacetrackEnvV1(RacetrackEnv):
                 else:
                     self.road.vehicles.append(vehicle)
 
-class RacetrackEnvV2(RacetrackEnv):
+class RacetrackEnvEight(RacetrackEnv):
     """
     A variant of racetrack-v0 with more loops:
     """
@@ -1901,7 +1901,7 @@ class RacetrackEnvV2(RacetrackEnv):
                     obstacle_3 = Obstacle(self.road, [75, -5])
                     self.road.objects.append(obstacle_3)
 
-class RacetrackEnvV3(RacetrackEnv):
+class RacetrackEnvRewards(RacetrackEnvLoop):
     """Different reward functions"""
     def default_config(cls) -> dict:
         config = super().default_config()
