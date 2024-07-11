@@ -97,7 +97,7 @@ class RacetrackEnv(AbstractEnv):
         # CL: Above: Original reward, below alternative
         if self.config["new_reward"]:
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
-            reward = ((1-self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
+            reward = ((1-self.crash_or_hit()) * reward + self.crash_or_hit() * self.config["collision_reward"] \
                      - self._is_terminated())
         return reward
 
@@ -1186,35 +1186,6 @@ class RacetrackEnvV2(RacetrackEnv):
     A variant of racetrack-v0 with more loops:
     """
 
-    def _reward(self, action: np.ndarray) -> float:
-        rewards = self._rewards(action)
-        reward = sum(
-            self.config.get(name, 0) * reward for name, reward in rewards.items()
-        )
-        reward = utils.lmap(reward, [self.config["collision_reward"], 1], [0, 1])
-        reward *= rewards["on_road_reward"]
-        # CL: Above: Original reward, below alternative
-        if self.config["new_reward"]:
-            # CL: New reward, negative for crash or hit ("ghost collision"), else original
-            reward = ((1-self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
-                     - self._is_terminated())
-        return reward
-
-    def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
-        _, lateral = self.vehicle.lane.local_coordinates(self.vehicle.position)
-        scaled_speed = utils.lmap(
-            self.vehicle.speed, self.config["reward_speed_range"], [0, 1]
-        )
-        return {
-            "lane_centering_reward": 1
-            / (1 + self.config["lane_centering_cost"] * lateral**2),
-            "action_reward": np.linalg.norm(action),
-            # CL: Allow for "ghost collisions"
-            "collision_reward": self.crash_or_hit(),
-            "on_road_reward": self.vehicle.on_road,
-            "high_speed_reward": np.clip(scaled_speed, 0, 1),
-        }
-
     def _make_road(self) -> None:
         net = RoadNetwork()
 
@@ -1929,3 +1900,236 @@ class RacetrackEnvV2(RacetrackEnv):
                 if indicator_2 == 1:
                     obstacle_3 = Obstacle(self.road, [75, -5])
                     self.road.objects.append(obstacle_3)
+
+class RacetrackEnvV3(RacetrackEnv):
+    """Different reward functions"""
+    def default_config(cls) -> dict:
+        config = super().default_config()
+        config.update(
+            {
+                "observation": {
+                "type": "OccupancyGrid",
+                "features": ["presence", "on_road", "x", "y", "vx", "vy", "cos_h", "sin_h"],
+                "features_range": {
+                        "x": [-100, 100],
+                        "y": [-100, 100],
+                        "vx": [-20, 20],
+                        "vy": [-20, 20]
+                    },
+                    "grid_size": [[-27.5, 27.5], [-27.5, 27.5]],
+                    "grid_step": [5, 5],
+                    "absolute": False
+                },
+                "action": {
+                    "type": "ContinuousAction",
+                    "longitudinal": False,
+                    "lateral": True,
+                    "target_speeds": [0, 5, 10],
+                },
+                "simulation_frequency": 15,
+                "policy_frequency": 5,
+                "duration": 300,
+                "collision_reward": -1,
+                "lane_centering_cost": 4,
+                "lane_centering_reward": 1,
+                "action_reward": -0.3,
+                "controlled_vehicles": 1,
+                "other_vehicles": 1,
+                "screen_width": 1000,
+                "screen_height": 1000,
+                "centering_position": [0.5, 0.5],
+                "new_reward": True,                 # CL: Created new reward function; used if int
+                "restrict_init_collision": 20,      # CL: Change the distance to prevent init collision
+                "hit": False,                       # CL: Allows 'hits' but continuing, i.e., 'ghost car'
+                "terminate_off_road": False,        # CL: terminate if car goes off-road
+                "speed_limits": [None, 25, 15, 25, 15, 25, 15, 25, 15],     # CL: Speed limits for road segments
+                "extra_speed": [10, 5, 2],          # CL: More speed on innermost lanes
+                "no_lanes": 6,                      # CL: Integer number of lanes
+                "rand_object": 0,                   # CL: No. of random object on road
+                "scenario_1": False,                # CL: Custom scenario 1
+                "length_v1": 200,                   # CL: length of track for v1
+                "max_objects": 4,                   # CL: maximum number of objects per lane
+                "rand_indicator": False,            # CL: indicator blocks per default same status as block, True: rand
+                "prob": 0.5,
+                "reward_speed_range": [20, 30],
+                "spawns": False,
+                "reward_fct": "default",             # CL: also: "highway", "copilot", "custom", "eight"
+                "high_speed_reward": 1,
+                "right_lane_reward": 1,
+                "normalize_reward": True,
+                "collision_penalty_min": -1.0,
+                "collision_penalty_max": 0.0,
+                "off_road_penalty_min": -1.0,
+                "off_road_penalty_max": 0.0,
+                "speed_reward_min": 0.0,
+                "speed_reward_max": 12.0,  # Assuming the maximum speed is 30
+                "action_penalty_min": -0.1,
+                "action_penalty_max": 0.0,
+                "speed_factor": 1.0,
+                "action_factor": 1.0,
+            }
+        )
+        return config
+
+    if self.config["reward_fct"] == "default":
+        def _reward(self, action: np.ndarray) -> float:
+            rewards = self._rewards(action)
+            reward = sum(
+                self.config.get(name, 0) * reward for name, reward in rewards.items()
+            )
+            reward = utils.lmap(reward, [self.config["collision_reward"], 1], [0, 1])
+            reward *= rewards["on_road_reward"]
+            # CL: Above: Original reward, below alternative
+            if self.config["new_reward"]:
+                # CL: New reward, negative for crash or hit ("ghost collision"), else original
+                reward = ((1 - self.crash_or_hit()) * reward + self.crash_or_hit() * self.config["collision_reward"] \
+                          - self._is_terminated())
+            return reward
+
+        def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
+            _, lateral = self.vehicle.lane.local_coordinates(self.vehicle.position)
+            return {
+                "lane_centering_reward": 1
+                                         / (1 + self.config["lane_centering_cost"] * lateral ** 2),
+                "action_reward": np.linalg.norm(action),    # CL: Penalize actions
+                # CL: Allow for "ghost collisions"
+                "collision_reward": self.crash_or_hit(),    # that is 0 or 1
+                "on_road_reward": self.vehicle.on_road,     # that is 0 or 1
+            }
+
+    elif self.config["reward_fct"] == "highway":
+        def _reward(self, action: Action) -> float:
+            """
+            The reward is defined to foster driving at high speed, on the rightmost lanes, and to avoid collisions.
+            :param action: the last action performed
+            :return: the corresponding reward
+            """
+            rewards = self._rewards(action)
+            reward = sum(
+                self.config.get(name, 0) * reward for name, reward in rewards.items()
+            )
+            if self.config["normalize_reward"]:
+                reward = utils.lmap(
+                    reward,
+                    [
+                        self.config["collision_reward"],
+                        self.config["high_speed_reward"] + self.config["right_lane_reward"],
+                    ],
+                    [0, 1],
+                )
+            reward *= rewards["on_road_reward"]
+            return reward
+
+        def _rewards(self, action: Action) -> Dict[Text, float]:
+            neighbours = self.road.network.all_side_lanes(self.vehicle.lane_index)
+            lane = (
+                self.vehicle.target_lane_index[2]
+                if isinstance(self.vehicle, ControlledVehicle)
+                else self.vehicle.lane_index[2]
+            )
+            # Use forward speed rather than speed, see https://github.com/eleurent/highway-env/issues/268
+            forward_speed = self.vehicle.speed * np.cos(self.vehicle.heading)
+            scaled_speed = utils.lmap(
+                forward_speed, self.config["reward_speed_range"], [0, 1]
+            )
+            return {
+                "collision_reward": float(self.vehicle.crashed),
+                "right_lane_reward": lane / max(len(neighbours) - 1, 1),
+                "high_speed_reward": np.clip(scaled_speed, 0, 1),
+                "on_road_reward": float(self.vehicle.on_road),
+            }
+
+    elif self.config["reward_fct"] == "copilot":
+        def _reward(self, action: np.ndarray) -> float:
+            rewards = self._rewards(action)
+            normalized_rewards = {
+                name: utils.lmap(reward, [self.config[name + "_min"], self.config[name + "_max"]], [0, 1])
+                for name, reward in rewards.items()
+            }
+            reward = sum(
+                self.config.get(name, 0) * normalized_reward for name, normalized_reward in normalized_rewards.items()
+            )
+            return reward
+
+        def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
+            _, lateral = self.vehicle.lane.local_coordinates(self.vehicle.position)
+            return {
+                "collision_penalty": -1000.0 if self.vehicle.crashed else 0.0,
+                "off_road_penalty": -100.0 if not self.vehicle.on_road else 0.0,
+                "speed_reward": self.vehicle.speed,
+                "action_penalty": -0.1,
+            }
+
+    elif self.config["reward_fct"] == "custom":
+        def _reward(self, action: Action) -> float:
+            """
+            The reward is defined to foster driving at high speed, on the rightmost lanes, and to avoid collisions.
+            :param action: the last action performed
+            :return: the corresponding reward
+            """
+            rewards = self._rewards(action)
+            reward = sum(
+                self.config.get(name, 0) * reward for name, reward in rewards.items()
+            )
+            if self.config["normalize_reward"]:
+                reward = utils.lmap(
+                    reward,
+                    [
+                        self.config["collision_reward"],
+                        self.config["high_speed_reward"] + self.config["right_lane_reward"],
+                    ],
+                    [0, 1],
+                )
+            reward *= rewards["on_road_reward"]
+            return reward
+
+        def _rewards(self, action: Action) -> Dict[Text, float]:
+            neighbours = self.road.network.all_side_lanes(self.vehicle.lane_index)
+            lane = (
+                self.vehicle.target_lane_index[2]
+                if isinstance(self.vehicle, ControlledVehicle)
+                else self.vehicle.lane_index[2]
+            )
+            # Use forward speed rather than speed, see https://github.com/eleurent/highway-env/issues/268
+            forward_speed = self.vehicle.speed
+
+            return {
+                "collision_reward": (- float(self.vehicle.crashed) * (-self.config["collision_reward"])),
+                "action_reward": np.linalg.norm(action) * self.config["action_factor"],    # CL: Penalize actions
+                "high_speed_reward": (forward_speed/(self.config["speed_limits"][1]+self.config["extra_speed"][0])
+                                      * self.config["speed_factor"]),
+                "off_road": - float(self._is_terminated()),
+            }
+
+    elif self.config["reward_fct"] == "eight":
+        def _reward(self, action: np.ndarray) -> float:
+            rewards = self._rewards(action)
+            reward = sum(
+                self.config.get(name, 0) * reward for name, reward in rewards.items()
+            )
+            reward = utils.lmap(reward, [self.config["collision_reward"], 1], [0, 1])
+            reward *= rewards["on_road_reward"]
+            # CL: Above: Original reward, below alternative
+            if self.config["new_reward"]:
+                # CL: New reward, negative for crash or hit ("ghost collision"), else original
+                reward = ((1-self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
+                         - self._is_terminated())
+            return reward
+
+        def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
+            _, lateral = self.vehicle.lane.local_coordinates(self.vehicle.position)
+            scaled_speed = utils.lmap(
+                self.vehicle.speed, self.config["reward_speed_range"], [0, 1]
+            )
+            return {
+                "lane_centering_reward": 1
+                / (1 + self.config["lane_centering_cost"] * lateral**2),
+                "action_reward": np.linalg.norm(action),
+                # CL: Allow for "ghost collisions"
+                "collision_reward": self.crash_or_hit(),
+                "on_road_reward": self.vehicle.on_road,
+                "high_speed_reward": np.clip(scaled_speed, 0, 1),
+            }
+
+    else:
+        print("No reward function selected.")
