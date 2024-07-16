@@ -1981,15 +1981,17 @@ class RacetrackEnvDefaultReward(RacetrackEnvLoop):
         # CL: Above: Original reward, below alternative
         if self.config["new_reward"]:
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
-            reward = ((1 - self.crash_or_hit()) * reward + self.crash_or_hit() * self.config["collision_reward"] \
+            reward = ((1 - self.crash_or_hit()) * reward + self.crash_or_hit() * self.config["collision_reward"]
                       - self._is_terminated())
+
+        print("Value", reward)
+
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
         _, lateral = self.vehicle.lane.local_coordinates(self.vehicle.position)
         return {
-            "lane_centering_reward": 1
-                                     / (1 + self.config["lane_centering_cost"] * lateral ** 2),
+            "lane_centering_reward": 1/(1 + self.config["lane_centering_cost"] * lateral ** 2),
             "action_reward": np.linalg.norm(action),  # CL: Penalize actions
             # CL: Allow for "ghost collisions"
             "collision_reward": self.crash_or_hit(),  # that is 0 or 1
@@ -2018,6 +2020,7 @@ class RacetrackEnvHighwayReward(RacetrackEnvDefaultReward):
                 [0, 1],
             )
         reward *= rewards["on_road_reward"]
+        print("Value", reward)
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2050,6 +2053,7 @@ class RacetrackEnvCopilotReward(RacetrackEnvDefaultReward):
         reward = sum(
             self.config.get(name, 0) * normalized_reward for name, normalized_reward in normalized_rewards.items()
         )
+        print("Value", reward)
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2070,18 +2074,11 @@ class RacetrackEnvCustomReward(RacetrackEnvDefaultReward):
         :return: the corresponding reward
         """
         rewards = self._rewards(action)
+        print(rewards["collision_reward"])
         reward = sum(
             self.config.get(name, 0) * reward for name, reward in rewards.items()
         )
-        if self.config["normalize_reward"]:
-            reward = utils.lmap(
-                reward,
-                [
-                    self.config["collision_reward"],
-                    self.config["high_speed_reward"] + self.config["right_lane_reward"],
-                ],
-                [0, 1],
-            )
+        print("Value", reward)
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2089,7 +2086,7 @@ class RacetrackEnvCustomReward(RacetrackEnvDefaultReward):
         forward_speed = self.vehicle.speed
 
         return {
-            "collision_reward": (- float(self.vehicle.crashed) * (-self.config["collision_reward"])),
+            "collision_reward": float(self.vehicle.crashed),
             "action_reward": np.linalg.norm(action) * self.config["action_factor"],  # CL: Penalize actions
             "high_speed_reward": (forward_speed / (self.config["speed_limits"][1] + self.config["extra_speed"][0])
                                   * self.config["speed_factor"]),
@@ -2110,6 +2107,7 @@ class RacetrackEnvEightReward(RacetrackEnvDefaultReward):
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
             reward = ((1 - self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
                       - self._is_terminated())
+        print("Value", reward)
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
