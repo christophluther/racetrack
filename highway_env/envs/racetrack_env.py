@@ -1967,6 +1967,7 @@ class RacetrackEnvDefaultReward(RacetrackEnvLoop):
                 "action_penalty_max": 0.0,
                 "speed_factor": 1.0,
                 "action_factor": 1.0,
+                "verbose": False,
             }
         )
         return config
@@ -1983,8 +1984,8 @@ class RacetrackEnvDefaultReward(RacetrackEnvLoop):
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
             reward = ((1 - self.crash_or_hit()) * reward + self.crash_or_hit() * self.config["collision_reward"]
                       - self._is_terminated())
-
-        print("Value", reward)
+        if self.config["verbose"]:
+            print("Value", reward)
 
         return reward
 
@@ -2020,7 +2021,9 @@ class RacetrackEnvHighwayReward(RacetrackEnvDefaultReward):
                 [0, 1],
             )
         reward *= rewards["on_road_reward"]
-        print("Value", reward)
+        if self.config["verbose"]:
+            print("Value", reward)
+
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2053,7 +2056,10 @@ class RacetrackEnvCopilotReward(RacetrackEnvDefaultReward):
         reward = sum(
             self.config.get(name, 0) * normalized_reward for name, normalized_reward in normalized_rewards.items()
         )
-        print("Value", reward)
+
+        if self.config["verbose"]:
+            print("Value", reward)
+
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2074,11 +2080,13 @@ class RacetrackEnvCustomReward(RacetrackEnvDefaultReward):
         :return: the corresponding reward
         """
         rewards = self._rewards(action)
-        print(rewards["collision_reward"])
         reward = sum(
             self.config.get(name, 0) * reward for name, reward in rewards.items()
         )
-        print("Value", reward)
+
+        if self.config["verbose"]:
+            print("Value", reward)
+
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -2107,7 +2115,10 @@ class RacetrackEnvEightReward(RacetrackEnvDefaultReward):
             # CL: New reward, negative for crash or hit ("ghost collision"), else original
             reward = ((1 - self.crash_or_hit()) * reward - self.crash_or_hit() * self.config["collision_reward"] \
                       - self._is_terminated())
-        print("Value", reward)
+
+        if self.config["verbose"]:
+            print("Value", reward)
+
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
