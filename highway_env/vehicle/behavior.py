@@ -40,8 +40,8 @@ class IDMVehicle(ControlledVehicle):
     """Range of delta when chosen randomly."""
 
     # Lateral policy parameters
-    POLITENESS = 0.0  # in [0, 1]
-    LANE_CHANGE_MIN_ACC_GAIN = 0.2  # [m/s2]
+    POLITENESS = 0.5  # in [0, 1]    # CL instead of 0
+    LANE_CHANGE_MIN_ACC_GAIN = 0.0  # [m/s2]        # CL instead if 0.2
     LANE_CHANGE_MAX_BRAKING_IMPOSED = 2.0  # [m/s2]
     LANE_CHANGE_DELAY = 1.0  # [s]
 
