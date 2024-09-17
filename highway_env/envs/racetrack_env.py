@@ -1967,6 +1967,7 @@ class RacetrackEnvDefaultReward(RacetrackEnvLoop):
                 "action_penalty_max": 0.0,
                 "speed_factor": 1.0,
                 "action_factor": 1.0,
+                "off_road_penalty": 10,
             }
         )
         return config
@@ -2019,7 +2020,10 @@ class RacetrackEnvHighwayReward(RacetrackEnvDefaultReward):
                 ],
                 [0, 1],
             )
+        print("On road: ", rewards["on_road_reward"])
         reward *= rewards["on_road_reward"]
+        if rewards["on_road_reward"] == 0:
+            reward = -self.config["off_road_penalty"]
         print("Value", reward)
         return reward
 
