@@ -107,33 +107,14 @@ def register_highway_envs():
 
     # CL:
     register(
+        id='racetrack-loop-spawns',
+        entry_point='highway_env.envs:RacetrackEnvSpawns',
+    )
+
+    # CL:
+    register(
         id='racetrack-eight',
         entry_point='highway_env.envs:RacetrackEnvEight',
-    )
-
-    register(
-        id='racetrack-loop-default',
-        entry_point='highway_env.envs:RacetrackEnvDefaultReward',
-    )
-
-    register(
-        id='racetrack-loop-highway',
-        entry_point='highway_env.envs:RacetrackEnvHighwayReward',
-    )
-
-    register(
-        id='racetrack-loop-copilot',
-        entry_point='highway_env.envs:RacetrackEnvCopilotReward',
-    )
-
-    register(
-        id='racetrack-loop-custom',
-        entry_point='highway_env.envs:RacetrackEnvCustomReward',
-    )
-
-    register(
-        id='racetrack-loop-eight',
-        entry_point='highway_env.envs:RacetrackEnvEightReward',
     )
 
     # roundabout_env.py
