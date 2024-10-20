@@ -588,17 +588,16 @@ class RacetrackEnvLoop(RacetrackEnv):
                 },
                 "simulation_frequency": 15,
                 "policy_frequency": 5,
-                "duration": 300,
-                "collision_reward": -1,
+                "duration": 180,
+                "collision_reward": -3,
                 "lane_centering_cost": 4,
                 "lane_centering_reward": 1,
                 "action_reward": -0.3,
                 "controlled_vehicles": 1,
-                "other_vehicles": 1,
+                "other_vehicles": 20,
                 "screen_width": 1000,
                 "screen_height": 1000,
                 "centering_position": [0.5, 0.5],
-                "new_reward": True, # CL: bool to toggle new reward fct (line 101)
                 "terminate_off_road": True, # CL: terminate if car goes off-road
                 "hit": False,   # CL: allows 'hits' without crash (i.e., car acts as 'ghost car')
                 "restrict_init_collision": 20,  # CL: Change the distance to prevent init collision
@@ -609,7 +608,7 @@ class RacetrackEnvLoop(RacetrackEnv):
                 "scenario_1": False,  # CL: Custom obstacle course on bottom straight
                 "scenario_2": False,  # CL: Custom obstacle course on bottom straight
                 "rand_object": None,  # CL: None = No objects, 0: random no. of objects, int: fixed no. of objects
-                "max_objects": 4,  # CL: maximum number of objects per lane
+                "max_objects": 2,  # CL: maximum number of objects per lane
                 "reward_speed_range": [20, 30],
                 "spawns": False,
                 # for highway reward
@@ -665,6 +664,53 @@ class RacetrackEnvLoop(RacetrackEnv):
             "on_road_reward": float(self.vehicle.on_road),
         }
 
+    def _make_vehicles(self) -> None:
+        """
+        Populate a road with several vehicles on the highway and on the merging lane, as well as an ego-vehicle.
+        """
+        rng = self.np_random
+        rng_int = np.random.default_rng()
+
+        if self.config["no_lanes"] == 0:
+            no_lanes = rng_int.integers(2, high=7)
+        else:
+            no_lanes = self.config["no_lanes"]
+
+        # Controlled vehicles
+        self.controlled_vehicles = []
+        for i in range(self.config["controlled_vehicles"]):
+            lane_index = ("a", "b", rng.integers(no_lanes)) if i == 0 else \
+                self.road.network.random_lane_index(rng)
+            controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
+                                                                             longitudinal=rng.uniform(20, 50))
+            print(lane_index)
+            self.controlled_vehicles.append(controlled_vehicle)
+            self.road.vehicles.append(controlled_vehicle)
+        # Front vehicle
+        vehicle = IDMVehicle.make_on_lane(self.road, ("b", "c", lane_index[-1]),
+                                          longitudinal=rng.uniform(
+                                              low=0,
+                                              high=self.road.network.get_lane(("b", "c", 0)).length
+                                          ),
+                                          speed=6+rng.uniform(high=3))
+        self.road.vehicles.append(vehicle)
+
+        # Other vehicles
+        for i in range(rng.integers(self.config["other_vehicles"])):
+            random_lane_index = self.road.network.random_lane_index(rng)
+            vehicle = IDMVehicle.make_on_lane(self.road, random_lane_index,
+                                              longitudinal=rng.uniform(
+                                                  low=0,
+                                                  high=self.road.network.get_lane(random_lane_index).length
+                                              ),
+                                              speed=6+rng.uniform(high=3))
+            # Prevent early collisions # CL: is now a parameter in configuration
+            for v in self.road.vehicles:
+                if np.linalg.norm(vehicle.position - v.position) < self.config["restrict_init_collision"]:
+                    break
+            else:
+                self.road.vehicles.append(vehicle)
+
     def _make_road(self) -> None:
         net = RoadNetwork()
 
@@ -697,6 +743,9 @@ class RacetrackEnvLoop(RacetrackEnv):
         )
         self.lane = lane
 
+        # successively add lanes
+        net.add_lane("a", "b", lane)
+
         # CL: This for loop must be separate for every segment bcs segment names have to be introduced
         for i in range(1, no_lanes-1):
             # add additional lanes between inner and outer lane
@@ -704,8 +753,7 @@ class RacetrackEnvLoop(RacetrackEnv):
                 extra = extra_speed[i]
             else:
                 extra = 0
-            # successively add lanes
-            net.add_lane("a", "b", lane)
+
             net.add_lane(
                 "a",
                 "b",
@@ -719,7 +767,6 @@ class RacetrackEnvLoop(RacetrackEnv):
             )
 
         # Lane 1: Outer Lane
-        net.add_lane("a", "b", lane)
         net.add_lane(
             "a",
             "b",
@@ -1125,19 +1172,19 @@ class RacetrackEnvLoop(RacetrackEnv):
             # a custom obstacle course that challenges the agent
 
             # Still obstacle
-            obstacle_1 = Obstacle(self.road, [length_v1-50,5])
+            obstacle_1 = Obstacle(self.road, [length_v1,5])
             self.road.objects.append(obstacle_1)
 
             # Still obstacle
-            obstacle_2 = Obstacle(self.road, [length_v1-50,10])
+            obstacle_2 = Obstacle(self.road, [length_v1,10])
             self.road.objects.append(obstacle_2)
 
             # Still obstacle
-            obstacle_3 = Obstacle(self.road, [length_v1-50, 15])
+            obstacle_3 = Obstacle(self.road, [length_v1, 15])
             self.road.objects.append(obstacle_3)
 
             # Still obstacle
-            obstacle_4 = Obstacle(self.road, [length_v1-50, 20])
+            obstacle_4 = Obstacle(self.road, [length_v1, 20])
             self.road.objects.append(obstacle_4)
 
 
@@ -1978,14 +2025,19 @@ class RacetrackEnvEight(RacetrackEnvLoop):
         block_one = np.random.binomial(1, self.config["prob"])
         block_two = np.random.binomial(1, self.config["prob"])
 
+        if self.config["pos"] == 0:
+            position = rng.choice(range(1, 4, 1))
+        else:
+            position = self.config["pos"]
+
         if block_one == 1:
-            if self.config["pos"] == 1:
+            if position == 1:
                 obstacle_0 = Obstacle(self.road, [200,30])
                 self.road.objects.append(obstacle_0)
-            elif self.config["pos"] == 2:
+            elif position == 2:
                 obstacle_0 = Obstacle(self.road, [110,0])
                 self.road.objects.append(obstacle_0)
-            elif self.config["pos"] == 3:
+            elif position == 3:
                 obstacle_0 = Obstacle(self.road, [150,0])
                 self.road.objects.append(obstacle_0)
 
@@ -2006,13 +2058,13 @@ class RacetrackEnvEight(RacetrackEnvLoop):
                     self.road.objects.append(obstacle_1)
 
         if block_two == 1:
-            if self.config["pos"] == 1:
+            if position == 1:
                 obstacle_2 = Obstacle(self.road, [205, 30])
                 self.road.objects.append(obstacle_2)
-            elif self.config["pos"] == 2:
+            elif position == 2:
                 obstacle_2 = Obstacle(self.road, [110, 5])
                 self.road.objects.append(obstacle_2)
-            elif self.config["pos"] == 3:
+            elif position == 3:
                 obstacle_2 = Obstacle(self.road, [150, 5])
                 self.road.objects.append(obstacle_2)
 
