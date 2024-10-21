@@ -607,6 +607,7 @@ class RacetrackEnvLoop(RacetrackEnv):
                 "no_lanes": 6,  # CL: Integer number of lanes
                 "scenario_1": False,  # CL: Custom obstacle course on bottom straight
                 "scenario_2": False,  # CL: Custom obstacle course on bottom straight
+                "scenario_3": False,  # CL: Custom obstacle course on bottom straight
                 "rand_object": None,  # CL: None = No objects, 0: random no. of objects, int: fixed no. of objects
                 "max_objects": 2,  # CL: maximum number of objects per lane
                 "reward_speed_range": [20, 30],
@@ -1187,6 +1188,12 @@ class RacetrackEnvLoop(RacetrackEnv):
             obstacle_4 = Obstacle(self.road, [length_v1, 20])
             self.road.objects.append(obstacle_4)
 
+        # scenario 2 with two open lanes
+        if self.config["scenario_3"]:
+            # a custom obstacle course that challenges the agent
+            # Still obstacle
+            obstacle_1 = Obstacle(self.road, [length_v1, 5])
+            self.road.objects.append(obstacle_1)
 
         if self.config["rand_object"] is not None:
 
