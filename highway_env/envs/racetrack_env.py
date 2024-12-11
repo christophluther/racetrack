@@ -643,7 +643,6 @@ class RacetrackEnvLoop(RacetrackEnv):
         reward *= rewards["on_road_reward"]
         if rewards["on_road_reward"] == 0:
             reward = -self.config["off_road_penalty"]
-        print("Reward: ", reward)
         return reward
 
     def _rewards(self, action: np.ndarray) -> Dict[Text, float]:
@@ -684,7 +683,6 @@ class RacetrackEnvLoop(RacetrackEnv):
                 self.road.network.random_lane_index(rng)
             controlled_vehicle = self.action_type.vehicle_class.make_on_lane(self.road, lane_index, speed=None,
                                                                              longitudinal=rng.uniform(20, 50))
-            print(lane_index)
             self.controlled_vehicles.append(controlled_vehicle)
             self.road.vehicles.append(controlled_vehicle)
         # Front vehicle
